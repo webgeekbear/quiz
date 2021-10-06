@@ -1,3 +1,9 @@
 :head {
   background: white;
 }
+
+.answer {
+  width: 50pt;
+  
+  border-top: 1pt solid black;
+}
