@@ -123,6 +123,40 @@ function displayTime() {
 function endQuiz() {
     clearInterval(countdownInterval);
 
+    // Prompt the user for their initials
+    let contentHolderEl = document.createElement("div");
+    contentHolderEl.className = "content-holder";
+    contentHolderEl.id = "content-holder";
+
+    let inputHeaderTextEl = document.createElement("h2");
+    inputHeaderTextEl.innerText = "All done!";
+    contentHolderEl.appendChild(inputHeaderTextEl);
+
+    let inputNormalTextEl = document.createElement("div");
+    inputNormalTextEl.innerText = "Your final score is " + timeCounter + ".";    
+    contentHolderEl.appendChild(inputNormalTextEl);
+
+    let inputHolderEl = document.createElement("div");
+    inputNormalTextEl.appendChild(inputHolderEl);
+
+    let labelEl = document.createElement("label");
+    labelEl.innerText = "Enter Initials:";
+    labelEl.setAttribute("for", "input-field");
+    inputHolderEl.appendChild(labelEl);
+
+    let initialInputEl = document.createElement("input");
+    initialInputEl.className = "input-field";
+    initialInputEl.name = "input-field";
+    initialInputEl.id = "input-field";
+    inputHolderEl.appendChild(initialInputEl);
+
+    let submitButtonEl = document.createElement("button");
+    submitButtonEl.className = "submit-button";
+    submitButtonEl.id = "submit-button";
+    submitButtonEl.innerText = "Submit";
+    inputHolderEl.appendChild(submitButtonEl);
+
+    contentContainerEl.appendChild(contentHolderEl);
 }
 
 function countdown() {
@@ -204,14 +238,15 @@ function handleAnswer(buttonEl) {
 
         displayTime();
     }
-
-    contentContainerEl.appendChild(answerStsEl);
+    
+    let contentHolderEl = document.getElementById("content-holder");
+    contentHolderEl.appendChild(answerStsEl);
 
     setTimeout(function () {
         removeQuestion();
-        contentContainerEl.removeChild(answerStsEl);
+        
         let currIndex = parseInt(index) + 1;
-        if (currIndex < quiz.length) {
+        if (currIndex < quiz.length && timeCounter) {
             createQuizQuestion(currIndex);
         } else {
             endQuiz();

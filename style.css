@@ -34,7 +34,6 @@ body {
 }
 
 .answer {
-  width: var(--content-width);  
   border-top: 1pt solid black;
 }
 
