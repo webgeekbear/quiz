@@ -25,13 +25,36 @@ var quiz = [{
 ];
 
 var timeCounter = quiz.length * 10; // 10 seconds per question on the quiz
+var countdownInterval = null;
 
 var quizContainerEl = document.getElementById("quiz-container");
 quizContainerEl.addEventListener("click", clickHandler);
 
 runQuiz();
 
+function displayTime() {
+    console.log(timeCounter);
+}
+
+function endQuiz() {
+    clearInterval(countdownInterval);
+
+}
+
+function countdown() {
+    if (timeCounter > 0) {
+        timeCounter--;
+        displayTime();
+    } else {
+        removeQuestion();
+        endQuiz();
+    }
+}
+
 function runQuiz() {
+    timeCounter = quiz.length * 15; // 10 seconds per question on the quiz
+    countdownInterval = setInterval(countdown, 1000);
+    displayTime();
     createQuizQuestion(0);
 }
 
@@ -41,13 +64,12 @@ function createQuizQuestion(index) {
     quizQuestionEl.className = "quiz-question";
     quizQuestionEl.id = "quiz-question";
     let quizItem = quiz[index];
-    console.log(index);
-    console.log(quizItem);
     quizQuestionEl.textContent = quizItem.question;
 
-    for (let i = 0; i < quiz[index].answers.length; i++) {
-        const answer = quiz[index].answers[i];
+    for (let i = 0; i < quizItem.answers.length; i++) {
+        const answer = quizItem.answers[i];
         let answerDivEl = document.createElement("div");
+        answerDivEl.className = "button-holder";
         let answerEl = document.createElement("button");
 
         answerEl.className = "data-answer";
@@ -83,18 +105,33 @@ function handleAnswer(buttonEl) {
         answerStsEl.textContent = "Correct";
     } else {
         answerStsEl.textContent = "Incorrect";
+        timeCounter -= 10; // User loses 10 seconds for incorrect answer.
+        if (timeCounter <= 0) {
+            timeCounter = 0;
+        }
+
+        displayTime();
     }
 
     quizContainerEl.appendChild(answerStsEl);
 
     setTimeout(function () {
-        let quizQuestionEl = document.getElementById("quiz-question");
-        quizContainerEl.removeChild(quizQuestionEl);
+        removeQuestion();
         quizContainerEl.removeChild(answerStsEl);
-        if (parseInt(index) + 1 < quiz.length) {
-            createQuizQuestion(parseInt(index) + 1);
+        let currIndex = parseInt(index) + 1;
+        if (currIndex < quiz.length) {
+            createQuizQuestion(currIndex);
+        } else {
+            endQuiz();
         }
-    }, 1 * 1000);
+    }, 0.5 * 1000);
 
     // DON'T do anything here!
+}
+
+function removeQuestion() {
+    let quizQuestionEl = document.getElementById("quiz-question");
+    if (quizQuestionEl) {
+        quizContainerEl.removeChild(quizQuestionEl);
+    }
 }

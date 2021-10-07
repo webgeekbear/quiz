@@ -2,8 +2,28 @@
   background: white;
 }
 
+.body {
+  display: flex;
+}
+
 .answer {
-  width: 50pt;
-  
+  width: 50pt;  
   border-top: 1pt solid black;
+}
+
+button {
+  background-color: blue;
+  color: white;
+  font-size: 20px;
+}
+
+.display-high-scores {
+  color: black;
+  background-color: white;
+  text-decoration: underline;
+  border: none;
+}
+
+.button-holder {
+  padding-top: 10px;
 }
