@@ -1,39 +1,123 @@
 var quiz = [{
-        question: "How much wood would a wood chuck chuck?",
+        question: "Commonly used data types do not include?",
         answers: [{
                 correct: false,
-                display: "Unknown"
+                display: "Strings"
+            },
+            {
+                correct: false,
+                display: "booleans"
             },
             {
                 correct: true,
-                display: "If a wood chuck could chuck wood"
+                display: "alerts"
+            },
+            {
+                correct: false,
+                display: "numbers"
             }
         ]
     },
     {
-        "question": "Mares eat oats and does eat oats?",
-        "answers": [{
+        question: "The condition in a IF/ELSE statement is enclosed with __________?",
+        answers: [{
                 correct: false,
-                display: "Unknown"
+                display: "Quotes"
+            },
+            {
+                correct: false,
+                display: "curly brackets"
             },
             {
                 correct: true,
-                display: "and little lambs eat ivy"
+                display: "parenthesis"
+            },
+            {
+                correct: false,
+                display: "square brackets"
+            }
+        ]
+    },
+    {
+        question: "Arrays in JavaScript can be used to store __________?",
+        answers: [
+            {
+                correct: false,
+                display: "numbers and strings"
+            },
+            {
+                correct: false,
+                display: "other arrays"
+            },
+            {
+                correct: false,
+                display: "booleans"
+            },
+            {
+                correct: true,
+                display: "all of the above"
+            }
+        ]
+    },
+    {
+        question: "String values must be enclosed with __________ when being assigned to variables?",
+        answers: [
+            {
+                correct: false,
+                display: "commas"
+            },
+            {
+                correct: false,
+                display: "curly brackets"
+            },
+            {
+                correct: true,
+                display: "quotes"
+            },
+            {
+                correct: false,
+                display: "parenthesis"
+            }
+        ]
+    },
+    {
+        question: "A very useful tool used in development and debugging " +
+            "for printing content to the debugger is?",
+        answers: [
+            {
+                correct: false,
+                display: "JavaScript"
+            },
+            {
+                correct: false,
+                display: "terminal/bash"
+            },
+            {
+                correct: false,
+                display: "for loops"
+            },
+            {
+                correct: true,
+                display: "console.log()"
             }
         ]
     }
 ];
 
-var timeCounter = quiz.length * 10; // 10 seconds per question on the quiz
+var timeCounter = 0; // number of seconds remaining on the quiz
 var countdownInterval = null;
 
-var quizContainerEl = document.getElementById("quiz-container");
-quizContainerEl.addEventListener("click", clickHandler);
+var bodyContainerEl = document.getElementById("body");
+bodyContainerEl.addEventListener("click", clickHandler);
+
+var contentContainerEl = document.getElementById("content-container");
+
+var timerEl = document.getElementById("timer");
 
 runQuiz();
 
 function displayTime() {
-    console.log(timeCounter);
+    timerEl.textContent = " " + timeCounter;
 }
 
 function endQuiz() {
@@ -43,7 +127,7 @@ function endQuiz() {
 
 function countdown() {
     if (timeCounter > 0) {
-        timeCounter--;
+        // timeCounter--;
         displayTime();
     } else {
         removeQuestion();
@@ -52,19 +136,27 @@ function countdown() {
 }
 
 function runQuiz() {
-    timeCounter = quiz.length * 15; // 10 seconds per question on the quiz
-    countdownInterval = setInterval(countdown, 1000);
+    timeCounter = quiz.length * 15; // seconds per question on the quiz
     displayTime();
+
+    countdownInterval = setInterval(countdown, 1000);
     createQuizQuestion(0);
 }
 
 function createQuizQuestion(index) {
+    let contentHolderEl = document.createElement("div");
+    contentHolderEl.className = "content-holder";
+    contentHolderEl.id = "content-holder";
+    
+    contentContainerEl.appendChild(contentHolderEl);
 
-    let quizQuestionEl = document.createElement("h2");
-    quizQuestionEl.className = "quiz-question";
-    quizQuestionEl.id = "quiz-question";
+    let contentEl = document.createElement("h2");
+    contentEl.className = "content";
+
+    contentHolderEl.appendChild(contentEl);
+
     let quizItem = quiz[index];
-    quizQuestionEl.textContent = quizItem.question;
+    contentEl.textContent = quizItem.question;
 
     for (let i = 0; i < quizItem.answers.length; i++) {
         const answer = quizItem.answers[i];
@@ -82,10 +174,10 @@ function createQuizQuestion(index) {
 
         answerDivEl.appendChild(answerEl);
 
-        quizQuestionEl.appendChild(answerDivEl);
+        contentEl.appendChild(answerDivEl);
     }
 
-    quizContainerEl.appendChild(quizQuestionEl);
+    contentContainerEl.appendChild(contentHolderEl);
 }
 
 function clickHandler(event) {
@@ -113,11 +205,11 @@ function handleAnswer(buttonEl) {
         displayTime();
     }
 
-    quizContainerEl.appendChild(answerStsEl);
+    contentContainerEl.appendChild(answerStsEl);
 
     setTimeout(function () {
         removeQuestion();
-        quizContainerEl.removeChild(answerStsEl);
+        contentContainerEl.removeChild(answerStsEl);
         let currIndex = parseInt(index) + 1;
         if (currIndex < quiz.length) {
             createQuizQuestion(currIndex);
@@ -130,8 +222,8 @@ function handleAnswer(buttonEl) {
 }
 
 function removeQuestion() {
-    let quizQuestionEl = document.getElementById("quiz-question");
-    if (quizQuestionEl) {
-        quizContainerEl.removeChild(quizQuestionEl);
+    let contentHolderEl = document.getElementById("content-holder");
+    if (contentHolderEl) {
+        contentContainerEl.removeChild(contentHolderEl);
     }
 }

@@ -1,13 +1,40 @@
+:root {
+  --content-width: 25em;
+}
+
 :head {
   background: white;
 }
 
-.body {
+body {
   display: flex;
+  flex-wrap: wrap;
+  flex-direction: unset;
+  justify-content: space-between;
+}
+
+.time {
+  float: right;
+}
+
+.content-container {
+  display: flex;
+  align-items: center;
+}
+
+.content-holder {
+  display: block;
+  align-items: center;  
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
 }
 
 .answer {
-  width: 50pt;  
+  width: var(--content-width);  
   border-top: 1pt solid black;
 }
 
@@ -20,8 +47,8 @@ button {
 .display-high-scores {
   color: black;
   background-color: white;
-  text-decoration: underline;
   border: none;
+  font-size: 15 px;
 }
 
 .button-holder {
