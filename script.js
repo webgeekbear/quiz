@@ -40,8 +40,7 @@ var quiz = [{
     },
     {
         question: "Arrays in JavaScript can be used to store __________?",
-        answers: [
-            {
+        answers: [{
                 correct: false,
                 display: "numbers and strings"
             },
@@ -61,8 +60,7 @@ var quiz = [{
     },
     {
         question: "String values must be enclosed with __________ when being assigned to variables?",
-        answers: [
-            {
+        answers: [{
                 correct: false,
                 display: "commas"
             },
@@ -83,8 +81,7 @@ var quiz = [{
     {
         question: "A very useful tool used in development and debugging " +
             "for printing content to the debugger is?",
-        answers: [
-            {
+        answers: [{
                 correct: false,
                 display: "JavaScript"
             },
@@ -109,12 +106,19 @@ var countdownInterval = null;
 
 var bodyContainerEl = document.getElementById("body");
 bodyContainerEl.addEventListener("click", clickHandler);
+bodyContainerEl.addEventListener("keypress", keyPressHandler);
 
 var contentContainerEl = document.getElementById("content-container");
 
 var timerEl = document.getElementById("timer");
 
-runQuiz();
+var highScores = [];
+var savedScores = window.localStorage.getItem("high-scores");
+if (savedScores) {
+    highScores = JSON.parse(savedScores);
+}
+
+beginChallenge();
 
 function displayTime() {
     timerEl.textContent = " " + timeCounter;
@@ -133,7 +137,7 @@ function endQuiz() {
     contentHolderEl.appendChild(inputHeaderTextEl);
 
     let inputNormalTextEl = document.createElement("div");
-    inputNormalTextEl.innerText = "Your final score is " + timeCounter + ".";    
+    inputNormalTextEl.innerText = "Your final score is " + timeCounter + ".";
     contentHolderEl.appendChild(inputNormalTextEl);
 
     let inputHolderEl = document.createElement("div");
@@ -161,16 +165,16 @@ function endQuiz() {
 
 function countdown() {
     if (timeCounter > 0) {
-        // timeCounter--;
+        timeCounter--;
         displayTime();
     } else {
-        removeQuestion();
+        clearCenter();
         endQuiz();
     }
 }
 
-function runQuiz() {
-    timeCounter = quiz.length * 15; // seconds per question on the quiz
+function startQuiz() {
+    timeCounter = quiz.length * 15; // 15 seconds per question on the quiz
     displayTime();
 
     countdownInterval = setInterval(countdown, 1000);
@@ -181,7 +185,7 @@ function createQuizQuestion(index) {
     let contentHolderEl = document.createElement("div");
     contentHolderEl.className = "content-holder";
     contentHolderEl.id = "content-holder";
-    
+
     contentContainerEl.appendChild(contentHolderEl);
 
     let contentEl = document.createElement("h2");
@@ -198,7 +202,7 @@ function createQuizQuestion(index) {
         answerDivEl.className = "button-holder";
         let answerEl = document.createElement("button");
 
-        answerEl.className = "data-answer";
+        answerEl.className = "answer-button";
         answerEl.textContent = (i + 1) + ". " + answer.display;
         answerEl.setAttribute("data-index", index);
 
@@ -217,8 +221,82 @@ function createQuizQuestion(index) {
 function clickHandler(event) {
     let target = event.target;
 
-    if (target.className === "data-answer") {
-        handleAnswer(target);
+    switch (target.className) {
+        case "answer-button":
+            handleAnswer(target);
+            break;
+
+        case "submit-button":
+            handleInput();
+            break;
+
+        case "go-back":
+            clearCenter();
+            beginChallenge();
+            break;
+
+        case "clear-high-scores":
+            highScores = [];
+            clearCenter();
+            saveHighScores();
+            showHighScores();
+            break;
+
+        case "start-quiz":
+            clearCenter();
+            startQuiz();
+            break;
+
+        case "display-high-scores":
+            clearCenter();
+            showHighScores();
+            break;
+
+        default:
+            // Explicitly ignore all other clicks
+            break;
+    }
+}
+
+function beginChallenge() {
+    let contentHolderEl = createContentHolder();
+
+    let headingEl = document.createElement("h2");
+    headingEl.innerText = "Coding Quiz Challenge";
+    headingEl.className = "center-text";
+
+    let infoText1El = document.createElement("div");
+    infoText1El.innerText = "Try to answer the following code-related questions within the time limit.";
+    infoText1El.className = "center-text";
+
+    let infoText2El = document.createElement("div");
+    infoText2El.innerText = "Keep in mind that incorrect answers will penalize your score/time by ten seconds!";
+    infoText2El.className = "center-text";
+
+    let buttonContainerEl = document.createElement("div");
+    buttonContainerEl.className = "center-text";
+
+    let startQuizButtonEl = document.createElement("button");
+    startQuizButtonEl.innerText = "Start Quiz";
+    startQuizButtonEl.className = "start-quiz";
+
+    buttonContainerEl.appendChild(startQuizButtonEl);
+    
+    contentHolderEl.appendChild(headingEl);
+    contentHolderEl.appendChild(infoText1El);
+    contentHolderEl.appendChild(infoText2El);
+    contentHolderEl.appendChild(buttonContainerEl);
+
+    contentContainerEl.appendChild(contentHolderEl);
+}
+
+function keyPressHandler(event) {
+    // If we are on the input field
+    if (event.target.className === "input-field") {
+        // If enter key was pressed...
+        if (event.keyCode == 13 || event.which == 13) {
+            handleInput();
+        }
     }
 }
 
@@ -238,13 +316,13 @@ function handleAnswer(buttonEl) {
 
         displayTime();
     }
-    
+
     let contentHolderEl = document.getElementById("content-holder");
     contentHolderEl.appendChild(answerStsEl);
 
     setTimeout(function () {
-        removeQuestion();
-        
+        clearCenter();
+
         let currIndex = parseInt(index) + 1;
         if (currIndex < quiz.length && timeCounter) {
             createQuizQuestion(currIndex);
@@ -256,9 +334,101 @@ function handleAnswer(buttonEl) {
     // DON'T do anything here!
 }
 
-function removeQuestion() {
+function handleInput() {
+    let contentHolderEl = document.getElementById("content-holder")
+    if (contentHolderEl) {
+        let inputFieldEl = document.getElementById("input-field");
+        if (inputFieldEl) {
+            let input = inputFieldEl.value;
+            if (input) {
+                clearCenter();
+                let tempScores = [];
+
+                let currScore = {
+                    initials: input,
+                    score: timeCounter
+                }
+
+                let inserted = false;
+                if (!highScores.length) {
+                    tempScores.push(currScore);
+                } else {
+                    // Insert in order of highest score (most recent first if duplicates)
+                    for (let i = 0; i < highScores.length; i++) {
+                        if (!inserted && currScore.score >= highScores[i].score) {
+                            inserted = true;
+                            tempScores.push(currScore);
+                        }
+                        tempScores.push(highScores[i]);
+                    }
+
+                    if (!inserted) {
+                        tempScores.push(currScore);
+                    }
+                }
+
+                highScores = tempScores;
+
+                saveHighScores();
+                showHighScores();
+            } else {
+                alert("Please input your initials");
+                inputFieldEl.focus();
+            }
+        }
+    }
+}
+
+function saveHighScores() {
+    let saveScores = JSON.stringify(highScores);
+    window.localStorage.setItem("high-scores", saveScores);
+}
+
+function clearCenter() {
     let contentHolderEl = document.getElementById("content-holder");
     if (contentHolderEl) {
         contentContainerEl.removeChild(contentHolderEl);
     }
+}
+
+function createContentHolder() {
+    let contentHolderEl = document.createElement("div");
+    contentHolderEl.id = "content-holder";
+    contentHolderEl.className = "content-holder";
+
+    return contentHolderEl;
+}
+
+function showHighScores() {
+    let contentHolderEl = createContentHolder();
+
+    let highScoresTitleEl = document.createElement("h2");
+    highScoresTitleEl.textContent = "High scores";
+
+    contentHolderEl.appendChild(highScoresTitleEl);
+
+    for (let i = 0; i < highScores.length; i++) {
+        let currScoreEl = document.createElement("div");
+        currScoreEl.className = "high-score";
+        currScoreEl.textContent = (i + 1) + ":" + highScores[i].initials.trim() + " - " + highScores[i].score;
+
+        contentHolderEl.appendChild(currScoreEl);
+    }
+
+    let buttonHolderEl = document.createElement("div");
+
+    let goBackButtonEl = document.createElement("button");
+    goBackButtonEl.className = "go-back";
+    goBackButtonEl.innerText = "Go back"
+
+    let clearHighScoresEl = document.createElement("button");
+    clearHighScoresEl.className = "clear-high-scores";
+    clearHighScoresEl.innerText = "Clear high scores";
+
+    buttonHolderEl.appendChild(goBackButtonEl);
+    buttonHolderEl.appendChild(clearHighScoresEl);
+
+    contentHolderEl.appendChild(buttonHolderEl);
+
+    contentContainerEl.appendChild(contentHolderEl);
 }

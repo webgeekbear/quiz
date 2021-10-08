@@ -1,11 +1,3 @@
-:root {
-  --content-width: 25em;
-}
-
-:head {
-  background: white;
-}
-
 body {
   display: flex;
   flex-wrap: wrap;
@@ -13,8 +5,23 @@ body {
   justify-content: space-between;
 }
 
+.high-score {
+  background-color: mistyrose;
+  margin-bottom: 5px;
+}
+
 .time {
   float: right;
+}
+
+.go-back-button,
+.clear-high-scores {
+  margin: 5px;
+}
+
+.center-text {
+  text-align: center;
+  margin: 5px;
 }
 
 .content-container {
@@ -24,7 +31,7 @@ body {
 
 .content-holder {
   display: block;
-  align-items: center;  
+  align-items: center;
 }
 
 .content {
