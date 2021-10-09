@@ -113,6 +113,7 @@ var contentContainerEl = document.getElementById("content-container");
 var timerEl = document.getElementById("timer");
 
 var highScores = [];
+var inQuiz = false;
 
 getSavedScores();
 
@@ -176,8 +177,14 @@ function clickHandler(event) {
             break;
 
         case "display-high-scores":
-            clearCenter();
-            showHighScores();
+            // disable if user taking quiz
+            if (!inQuiz) {
+                clearCenter();
+                showHighScores();
+            } else {
+                // This has the beneficial side-effect of pausing the counter
+                alert("Display of high scores disabled during quiz.");
+            }
             break;
 
         case "go-back":
@@ -390,6 +397,8 @@ function handleInput() {
 
                 highScores = tempScores;
 
+                inQuiz = false;
+
                 saveHighScores();
                 showHighScores();
             } else {
@@ -443,6 +452,7 @@ function showHighScores() {
 
 // Start the quiz
 function startQuiz() {
+    inQuiz = true;
     timeCounter = quiz.length * 15; // 15 seconds per question on the quiz
     displayTimer();
 
