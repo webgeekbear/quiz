@@ -1,0 +1,48 @@
+:root {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: unset;
+  justify-content: space-between;
+}
+
+.high-score {
+  background-color: mistyrose;
+  margin-bottom: 5px;
+}
+
+.go-back,
+.clear-high-scores {
+  margin: 5px;
+}
+
+.center-text {
+  text-align: center;
+  margin: 5px;
+}
+
+.answer {
+  border-top: 1pt solid black;
+}
+
+button {
+  background-color: blue;
+  color: white;
+  font-size: 20px;
+  border-radius: 15px;
+}
+
+.button-holder {
+  padding-top: 10px;
+}
+
+.display-high-scores {
+  color: black;
+  background-color: white;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+}
