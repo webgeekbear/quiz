@@ -113,80 +113,116 @@ var contentContainerEl = document.getElementById("content-container");
 var timerEl = document.getElementById("timer");
 
 var highScores = [];
-var savedScores = window.localStorage.getItem("high-scores");
-if (savedScores) {
-    highScores = JSON.parse(savedScores);
-}
+
+getSavedScores();
 
 beginChallenge();
 
-function displayTime() {
-    timerEl.textContent = " " + timeCounter;
-}
+// Begin the challenge
+function beginChallenge() {
+    let contentHolderEl = createContentHolder();
 
-function endQuiz() {
-    clearInterval(countdownInterval);
+    let headingEl = document.createElement("h2");
+    headingEl.innerText = "Coding Quiz Challenge";
+    headingEl.className = "center-text";
 
-    // Prompt the user for their initials
-    let contentHolderEl = document.createElement("div");
-    contentHolderEl.className = "content-holder";
-    contentHolderEl.id = "content-holder";
+    let infoText1El = document.createElement("div");
+    infoText1El.innerText = "Try to answer the following code-related questions within the time limit.";
+    infoText1El.className = "center-text";
 
-    let inputHeaderTextEl = document.createElement("h2");
-    inputHeaderTextEl.innerText = "All done!";
-    contentHolderEl.appendChild(inputHeaderTextEl);
+    let infoText2El = document.createElement("div");
+    infoText2El.innerText = "Keep in mind that incorrect answers will penalize your score/time by ten seconds!";
+    infoText2El.className = "center-text";
 
-    let inputNormalTextEl = document.createElement("div");
-    inputNormalTextEl.innerText = "Your final score is " + timeCounter + ".";
-    contentHolderEl.appendChild(inputNormalTextEl);
+    let buttonContainerEl = document.createElement("div");
+    buttonContainerEl.className = "center-text";
 
-    let inputHolderEl = document.createElement("div");
-    inputNormalTextEl.appendChild(inputHolderEl);
+    let startQuizButtonEl = document.createElement("button");
+    startQuizButtonEl.innerText = "Start Quiz";
+    startQuizButtonEl.className = "start-quiz";
 
-    let labelEl = document.createElement("label");
-    labelEl.innerText = "Enter Initials:";
-    labelEl.setAttribute("for", "input-field");
-    inputHolderEl.appendChild(labelEl);
+    buttonContainerEl.appendChild(startQuizButtonEl);
 
-    let initialInputEl = document.createElement("input");
-    initialInputEl.className = "input-field";
-    initialInputEl.name = "input-field";
-    initialInputEl.id = "input-field";
-    inputHolderEl.appendChild(initialInputEl);
-
-    let submitButtonEl = document.createElement("button");
-    submitButtonEl.className = "submit-button";
-    submitButtonEl.id = "submit-button";
-    submitButtonEl.innerText = "Submit";
-    inputHolderEl.appendChild(submitButtonEl);
+    contentHolderEl.appendChild(headingEl);
+    contentHolderEl.appendChild(infoText1El);
+    contentHolderEl.appendChild(infoText2El);
+    contentHolderEl.appendChild(buttonContainerEl);
 
     contentContainerEl.appendChild(contentHolderEl);
 }
 
+// Clear the center section of the document
+function clearCenter() {
+    let contentHolderEl = document.getElementById("content-holder");
+    if (contentHolderEl) {
+        contentContainerEl.removeChild(contentHolderEl);
+    }
+}
+
+// Handle a click in the body of the document
+function clickHandler(event) {
+    let target = event.target;
+
+    switch (target.className) {
+        case "answer-button":
+            handleAnswer(target);
+            break;
+
+        case "clear-high-scores":
+            highScores = [];
+            clearCenter();
+            saveHighScores();
+            showHighScores();
+            break;
+
+        case "display-high-scores":
+            clearCenter();
+            showHighScores();
+            break;
+
+        case "go-back":
+            clearCenter();
+            beginChallenge();
+            break;
+
+        case "start-quiz":
+            clearCenter();
+            startQuiz();
+            break;
+
+        case "submit-button":
+            handleInput();
+            break;
+
+        default:
+            // Explicitly ignore all other clicks
+            break;
+    }
+}
+
+// Countdown to 0 seconds
 function countdown() {
     if (timeCounter > 0) {
         timeCounter--;
-        displayTime();
+        displayTimer();
     } else {
         clearCenter();
         endQuiz();
     }
 }
 
-function startQuiz() {
-    timeCounter = quiz.length * 15; // 15 seconds per question on the quiz
-    displayTime();
+// Create the content holder for the center screen
+function createContentHolder() {
+    let contentHolderEl = document.createElement("div");
+    contentHolderEl.id = "content-holder";
+    contentHolderEl.className = "content-holder";
 
-    countdownInterval = setInterval(countdown, 1000);
-    createQuizQuestion(0);
+    return contentHolderEl;
 }
 
+// Create the quiz question for the index in quiz
 function createQuizQuestion(index) {
-    let contentHolderEl = document.createElement("div");
-    contentHolderEl.className = "content-holder";
-    contentHolderEl.id = "content-holder";
-
-    contentContainerEl.appendChild(contentHolderEl);
+    let contentHolderEl = createContentHolder();
 
     let contentEl = document.createElement("h2");
     contentEl.className = "content";
@@ -218,78 +254,60 @@ function createQuizQuestion(index) {
     contentContainerEl.appendChild(contentHolderEl);
 }
 
-function clickHandler(event) {
-    let target = event.target;
+// Display the timer
+function displayTimer() {
+    timerEl.textContent = " " + timeCounter;
+}
 
-    switch (target.className) {
-        case "answer-button":
-            handleAnswer(target);
-            break;
+// End the quiz
+function endQuiz() {
+    clearInterval(countdownInterval);
 
-        case "submit-button":
-            handleInput();
-            break;
+    // Prompt the user for their initials
+    let contentHolderEl = createContentHolder();
 
-        case "go-back":
-            clearCenter();
-            beginChallenge();
-            break;
+    let inputHeaderTextEl = document.createElement("h2");
+    inputHeaderTextEl.innerText = "All done!";
+    contentHolderEl.appendChild(inputHeaderTextEl);
 
-        case "clear-high-scores":
-            highScores = [];
-            clearCenter();
-            saveHighScores();
-            showHighScores();
-            break;
+    let inputNormalTextEl = document.createElement("div");
+    inputNormalTextEl.innerText = "Your final score is " + timeCounter + ".";
+    contentHolderEl.appendChild(inputNormalTextEl);
 
-        case "start-quiz":
-            clearCenter();
-            startQuiz();
-            break;
+    let inputHolderEl = document.createElement("div");
+    inputNormalTextEl.appendChild(inputHolderEl);
 
-        case "display-high-scores":
-            clearCenter();
-            showHighScores();
-            break;
+    let labelEl = document.createElement("label");
+    labelEl.innerText = "Enter Initials:";
+    labelEl.setAttribute("for", "input-field");
+    inputHolderEl.appendChild(labelEl);
 
-        default:
-            // Explicitly ignore all other clicks
-            break;
+    let initialInputEl = document.createElement("input");
+    initialInputEl.className = "input-field";
+    initialInputEl.name = "input-field";
+    initialInputEl.id = "input-field";
+    inputHolderEl.appendChild(initialInputEl);
+
+    let submitButtonEl = document.createElement("button");
+    submitButtonEl.className = "submit-button";
+    submitButtonEl.id = "submit-button";
+    submitButtonEl.innerText = "Submit";
+    inputHolderEl.appendChild(submitButtonEl);
+
+    contentContainerEl.appendChild(contentHolderEl);
+
+    initialInputEl.focus();
+}
+
+// Get the saved scores
+function getSavedScores() {
+    let savedScores = window.localStorage.getItem("high-scores");
+    if (savedScores) {
+        highScores = JSON.parse(savedScores);
     }
 }
 
-function beginChallenge() {
-    let contentHolderEl = createContentHolder();
-
-    let headingEl = document.createElement("h2");
-    headingEl.innerText = "Coding Quiz Challenge";
-    headingEl.className = "center-text";
-
-    let infoText1El = document.createElement("div");
-    infoText1El.innerText = "Try to answer the following code-related questions within the time limit.";
-    infoText1El.className = "center-text";
-
-    let infoText2El = document.createElement("div");
-    infoText2El.innerText = "Keep in mind that incorrect answers will penalize your score/time by ten seconds!";
-    infoText2El.className = "center-text";
-
-    let buttonContainerEl = document.createElement("div");
-    buttonContainerEl.className = "center-text";
-
-    let startQuizButtonEl = document.createElement("button");
-    startQuizButtonEl.innerText = "Start Quiz";
-    startQuizButtonEl.className = "start-quiz";
-
-    buttonContainerEl.appendChild(startQuizButtonEl);
-    
-    contentHolderEl.appendChild(headingEl);
-    contentHolderEl.appendChild(infoText1El);
-    contentHolderEl.appendChild(infoText2El);
-    contentHolderEl.appendChild(buttonContainerEl);
-
-    contentContainerEl.appendChild(contentHolderEl);
-}
-
+// Handle a key press in the body of the document
 function keyPressHandler(event) {
     // If we are on the input field
     if (event.target.className === "input-field") {
@@ -300,6 +318,7 @@ function keyPressHandler(event) {
     }
 }
 
+// Handle an answer button
 function handleAnswer(buttonEl) {
     let index = buttonEl.getAttribute("data-index");
     let answerStsEl = document.createElement("div");
@@ -314,7 +333,7 @@ function handleAnswer(buttonEl) {
             timeCounter = 0;
         }
 
-        displayTime();
+        displayTimer();
     }
 
     let contentHolderEl = document.getElementById("content-holder");
@@ -334,6 +353,7 @@ function handleAnswer(buttonEl) {
     // DON'T do anything here!
 }
 
+// Handle input of initials for high score
 function handleInput() {
     let contentHolderEl = document.getElementById("content-holder")
     if (contentHolderEl) {
@@ -363,6 +383,7 @@ function handleInput() {
                     }
 
                     if (!inserted) {
+                        // If less than all other scores, add it.
                         tempScores.push(currScore);
                     }
                 }
@@ -379,26 +400,13 @@ function handleInput() {
     }
 }
 
+// Save high scores
 function saveHighScores() {
     let saveScores = JSON.stringify(highScores);
     window.localStorage.setItem("high-scores", saveScores);
 }
 
-function clearCenter() {
-    let contentHolderEl = document.getElementById("content-holder");
-    if (contentHolderEl) {
-        contentContainerEl.removeChild(contentHolderEl);
-    }
-}
-
-function createContentHolder() {
-    let contentHolderEl = document.createElement("div");
-    contentHolderEl.id = "content-holder";
-    contentHolderEl.className = "content-holder";
-
-    return contentHolderEl;
-}
-
+// Show high scores
 function showHighScores() {
     let contentHolderEl = createContentHolder();
 
@@ -431,4 +439,13 @@ function showHighScores() {
     contentHolderEl.appendChild(buttonHolderEl);
 
     contentContainerEl.appendChild(contentHolderEl);
+}
+
+// Start the quiz
+function startQuiz() {
+    timeCounter = quiz.length * 15; // 15 seconds per question on the quiz
+    displayTimer();
+
+    countdownInterval = setInterval(countdown, 1000);
+    createQuizQuestion(0);
 }
